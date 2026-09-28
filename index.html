@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ラグランジュの未定乗数法 — 等高線と束縛条件</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#fff;--fg:#1c1c28;--mut:#666;--blue:#1a237e;--red:#e53935;--card:#f4f5fa}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15161c;--fg:#e8e8f0;--mut:#9a9aaa;--blue:#8c9eff;--red:#ff6b64;--card:#22232c}}
+:root[data-theme="dark"]{--bg:#15161c;--fg:#e8e8f0;--mut:#9a9aaa;--blue:#8c9eff;--red:#ff6b64;--card:#22232c}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;line-height:1.6}
+main{max-width:720px;margin:0 auto;padding:16px}
+h1{font-size:1.15rem;margin:.2em 0}
+svg{width:100%;height:auto;max-width:100%;display:block;background:var(--bg)}
+.ctl{background:var(--card);border-radius:10px;padding:12px 14px;margin-top:8px}
+.ctl label{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+input[type=range]{flex:1;min-width:160px}
+#msg{font-weight:600;min-height:1.6em}
+.b{color:var(--blue)}.r{color:var(--red)}
+</style></head><body><main>
+<h1>ラグランジュの未定乗数法：等高線と束縛条件</h1>
+<svg id="s" viewBox="0 0 620 620" role="img" aria-label="等高線と束縛曲線"></svg>
+<div class="ctl">
+<label>束縛曲線上の点 <input id="t" type="range" min="0.3" max="5.6" step="0.005" value="1.5"></label>
+<label><input id="nv" type="checkbox" checked> 等高線上の法線ベクトル((f<sub>x</sub>, f<sub>y</sub>) の向き)を表示</label>
+<div id="msg"></div>
+<div style="color:var(--mut);font-size:.9rem">
+<span class="b">青</span>: (f<sub>x</sub>, f<sub>y</sub>)(等高線に垂直) ／ <span class="r">赤</span>: (g<sub>x</sub>, g<sub>y</sub>)(束縛曲線に垂直)。
+点を動かし、2本の矢印が平行になる位置(=束縛曲線が等高線に接する点)を探してみましょう。</div>
+</div>
+<script>
+const NS="http://www.w3.org/2000/svg",S=document.getElementById("s"),X=x=>50+x*90,Y=y=>570-y*90;
+const f=(x,y)=>Math.exp(-((x-3)**2/6+(y-3)**2/3));
+const grad=(x,y)=>{const v=f(x,y);return[-v*(x-3)/3,-v*(y-3)*2/3]};
+const yc=x=>1+.35*x+.12*(x-2)**2, gg=x=>[-.35-.24*(x-2),1];
+function el(n,a,p=S){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e}
+const css=v=>`var(--${v})`;
+el("defs",{}).innerHTML=["blue","red"].map(c=>`<marker id="m${c}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="${css(c)}"/></marker>`).join("");
+// 軸
+el("path",{d:"M50 570H600M50 570V30",stroke:"currentColor","stroke-width":1.5,fill:"none"});
+el("text",{x:604,y:585,fill:"currentColor","font-style":"italic","font-size":18}).textContent="x";
+el("text",{x:36,y:28,fill:"currentColor","font-style":"italic","font-size":18}).textContent="y";
+// 等高線
+const dstar=Math.exp(-0); const levels=[.2,.5,null];
+let xs=0,best=-1;for(let x=0;x<=6;x+=.0005){const v=f(x,yc(x));if(v>best){best=v;xs=x}}
+levels[2]=best;
+const normals=el("g",{});
+levels.forEach((lv,i)=>{const r=Math.sqrt(-Math.log(lv));
+ el("ellipse",{cx:X(3),cy:Y(3),rx:Math.sqrt(6)*r*90,ry:Math.sqrt(3)*r*90,fill:"none",stroke:css("blue"),"stroke-width":1.5,"stroke-dasharray":"5 4"});
+ const tx=el("text",{x:X(3+Math.sqrt(6)*r*Math.cos(-.8)),y:Y(3+Math.sqrt(3)*r*Math.sin(-.8))+ (i?14:14),fill:css("blue"),"font-size":15,"font-style":"italic"});
+ tx.textContent=i<2?`f = ${lv}`:"f = d*";
+ const n=[8,7,6][i];
+ for(let k=0;k<n;k++){const th=2*Math.PI*k/n+.35,px=3+Math.sqrt(6)*r*Math.cos(th),py=3+Math.sqrt(3)*r*Math.sin(th);
+  if(i==2&&Math.abs(px-xs)<.5&&Math.abs(py-yc(xs))<.5)continue;
+  const[a,b]=grad(px,py),L=Math.hypot(a,b);
+  el("line",{x1:X(px),y1:Y(py),x2:X(px)+a/L*34,y2:Y(py)-b/L*34,stroke:css("blue"),"stroke-width":1.4,"marker-end":"url(#mblue)"},normals)}
+});
+// 束縛曲線
+let d="";for(let x=0;x<=6;x+=.05){if(yc(x)<=6)d+=(d?"L":"M")+X(x)+" "+Y(yc(x))}
+el("path",{d,stroke:css("red"),"stroke-width":3,fill:"none"});
+el("text",{x:470,y:Y(yc(5))-22,fill:css("red"),"font-size":18,"font-style":"italic"}).textContent="g(x,y) = c";
+// 動く点
+const gF=el("line",{stroke:css("blue"),"stroke-width":3.5,"marker-end":"url(#mblue)"});
+const gG=el("line",{stroke:css("red"),"stroke-width":3.5,"marker-end":"url(#mred)"});
+const tF=el("text",{fill:css("blue"),"font-size":18}),tG=el("text",{fill:css("red"),"font-size":18});
+const sub=(t,l)=>{t.innerHTML=`(${l}<tspan dy="4" font-size="13">x</tspan><tspan dy="-4">, ${l}</tspan><tspan dy="4" font-size="13">y</tspan><tspan dy="-4">)</tspan>`};sub(tF,"f");sub(tG,"g");tF.setAttribute("text-anchor","end");
+const dot=el("circle",{r:6,fill:"currentColor"});
+function upd(){
+ const x=+t.value,y=yc(x),[a,b]=grad(x,y),[c,e]=gg(x);
+ const Lf=Math.hypot(a,b),Lg=Math.hypot(c,e),lf=60,lg=90;
+ const fx2=X(x)+a/Lf*lf,fy2=Y(y)-b/Lf*lf,gx2=X(x)+c/Lg*lg,gy2=Y(y)-e/Lg*lg;
+ dot.setAttribute("cx",X(x));dot.setAttribute("cy",Y(y));
+ gF.setAttribute("x1",X(x));gF.setAttribute("y1",Y(y));gF.setAttribute("x2",fx2);gF.setAttribute("y2",fy2);
+ gG.setAttribute("x1",X(x));gG.setAttribute("y1",Y(y));gG.setAttribute("x2",gx2);gG.setAttribute("y2",gy2);
+ tF.setAttribute("x",fx2-8);tF.setAttribute("y",fy2+4);tG.setAttribute("x",gx2+6);tG.setAttribute("y",gy2-4);
+ const cross=(a*e-b*c)/(Lf*Lg),ang=Math.asin(Math.max(-1,Math.min(1,cross)))*180/Math.PI;
+ const m=document.getElementById("msg");
+ const F="(f<sub>x</sub>, f<sub>y</sub>)",G="(g<sub>x</sub>, g<sub>y</sub>)",A=Math.abs(ang).toFixed(1);
+ m.innerHTML=Math.abs(ang)<1.5?`${F} ∥ ${G}（角度 ≈ ${A}°）→ 接点：${F} = λ${G} が成り立つ`:`${F} と ${G} のなす角 ≈ ${A}°（平行ではない）`;
+ m.style.color=Math.abs(ang)<1.5?"var(--red)":"var(--fg)";
+}
+t.oninput=upd;upd();
+nv.onchange=()=>normals.style.display=nv.checked?"":"none";
+</script></main></body></html>
