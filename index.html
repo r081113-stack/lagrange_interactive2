@@ -58,7 +58,7 @@ levels.forEach((lv,i)=>{const r=Math.sqrt(-Math.log(lv));
 // 制約曲線
 let d="";for(let x=0;x<=6;x+=.05){if(yc(x)<=6)d+=(d?"L":"M")+X(x)+" "+Y(yc(x))}
 el("path",{d,stroke:css("red"),"stroke-width":3,fill:"none"});
-el("text",{x:470,y:Y(yc(5))-22,fill:css("red"),"font-size":18,"font-style":"italic"}).textContent="g(x,y) = c";
+el("text",{x:470,y:Y(yc(5))-22,fill:css("red"),"font-size":18,"font-style":"italic"}).textContent="g(x,y) = 0";
 // 動く点
 const gF=el("line",{stroke:css("blue"),"stroke-width":3.5,"marker-end":"url(#mblue)"});
 const gG=el("line",{stroke:css("red"),"stroke-width":3.5,"marker-end":"url(#mred)"});
