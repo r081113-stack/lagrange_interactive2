@@ -22,11 +22,11 @@ input[type=range]{flex:1;min-width:160px}
 <svg id="s" viewBox="0 0 620 620" role="img" aria-label="等高線と束縛曲線"></svg>
 <div class="ctl">
 <label>束縛曲線上の点 <input id="t" type="range" min="0.3" max="5.6" step="0.005" value="1.5"></label>
-<label><input id="nv" type="checkbox" checked> 等高線上の法線ベクトル((f<sub>x</sub>, f<sub>y</sub>) の向き)を表示</label>
+<label><input id="nv" type="checkbox" checked> 等高線上の法線ベクトル(f<sub>x</sub>, f<sub>y</sub>) の向きを表示</label>
 <div id="msg"></div>
 <div style="color:var(--mut);font-size:.9rem">
-<span class="b">青</span>: (f<sub>x</sub>, f<sub>y</sub>)(等高線に垂直) ／ <span class="r">赤</span>: (g<sub>x</sub>, g<sub>y</sub>)(束縛曲線に垂直)。
-点を動かし、2本の矢印が平行になる位置(=束縛曲線が等高線に接する点)を探してみましょう。</div>
+<span class="b">青</span>: fの勾配ベクトル(f<sub>x</sub>, f<sub>y</sub>)(等高線に垂直) 　 <span class="r">赤</span>: gの勾配ベクトル(g<sub>x</sub>, g<sub>y</sub>)(束縛曲線に垂直)．
+点を動かし，2本の矢印が平行になる位置(=束縛曲線が等高線に接する点)を探してみよう．</div>
 </div>
 <script>
 const NS="http://www.w3.org/2000/svg",S=document.getElementById("s"),X=x=>50+x*90,Y=y=>570-y*90;
@@ -76,7 +76,7 @@ function upd(){
  const cross=(a*e-b*c)/(Lf*Lg),ang=Math.asin(Math.max(-1,Math.min(1,cross)))*180/Math.PI;
  const m=document.getElementById("msg");
  const F="(f<sub>x</sub>, f<sub>y</sub>)",G="(g<sub>x</sub>, g<sub>y</sub>)",A=Math.abs(ang).toFixed(1);
- m.innerHTML=Math.abs(ang)<1.5?`${F} ∥ ${G}（角度 ≈ ${A}°）→ 接点：${F} = λ${G} が成り立つ`:`${F} と ${G} のなす角 ≈ ${A}°（平行ではない）`;
+ m.innerHTML=Math.abs(ang)<1.5?`${F} ∥ ${G}（角度 ≈ ${A}°）→ 接点：${F} = λ${G} が成り立つ`:`2つの勾配ベクトル${F} と ${G} のなす角 ≈ ${A}°（平行ではない）`;
  m.style.color=Math.abs(ang)<1.5?"var(--red)":"var(--fg)";
 }
 t.oninput=upd;upd();
