@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ラグランジュの未定乗数法 — 等高線と束縛条件</title>
+<title>ラグランジュの未定乗数法 — 等高線と制約条件</title>
 <style>
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
 --bg:#fff;--fg:#1c1c28;--mut:#666;--blue:#1a237e;--red:#e53935;--card:#f4f5fa}
@@ -18,15 +18,15 @@ input[type=range]{flex:1;min-width:160px}
 #msg{font-weight:600;min-height:1.6em}
 .b{color:var(--blue)}.r{color:var(--red)}
 </style></head><body><main>
-<h1>ラグランジュの未定乗数法：等高線と束縛条件</h1>
-<svg id="s" viewBox="0 0 620 620" role="img" aria-label="等高線と束縛曲線"></svg>
+<h1>ラグランジュの未定乗数法：等高線と制約条件</h1>
+<svg id="s" viewBox="0 0 620 620" role="img" aria-label="等高線と制約曲線"></svg>
 <div class="ctl">
-<label>束縛曲線上の点 <input id="t" type="range" min="0.3" max="5.6" step="0.005" value="1.5"></label>
+<label>制約曲線上の点 <input id="t" type="range" min="0.3" max="5.6" step="0.005" value="1.5"></label>
 <label><input id="nv" type="checkbox" checked> 等高線上の法線ベクトル(f<sub>x</sub>, f<sub>y</sub>) の向きを表示</label>
 <div id="msg"></div>
 <div style="color:var(--mut);font-size:.9rem">
 <span class="b">青</span>: fの勾配ベクトル(f<sub>x</sub>, f<sub>y</sub>)(等高線に垂直) 　 <span class="r">赤</span>: gの勾配ベクトル(g<sub>x</sub>, g<sub>y</sub>)(束縛曲線に垂直)．
-スライダーで点を動かし，2本の矢印が平行になる位置(=束縛曲線が等高線に接する点)を探してみよう．</div>
+スライダーで点を動かし，2本の矢印が平行になる位置(=制約曲線が等高線に接する点)を探してみよう．</div>
 </div>
 <script>
 const NS="http://www.w3.org/2000/svg",S=document.getElementById("s"),X=x=>50+x*90,Y=y=>570-y*90;
@@ -48,14 +48,14 @@ const normals=el("g",{});
 levels.forEach((lv,i)=>{const r=Math.sqrt(-Math.log(lv));
  el("ellipse",{cx:X(3),cy:Y(3),rx:Math.sqrt(6)*r*90,ry:Math.sqrt(3)*r*90,fill:"none",stroke:css("blue"),"stroke-width":1.5,"stroke-dasharray":"5 4"});
  const tx=el("text",{x:X(3+Math.sqrt(6)*r*Math.cos(-.8)),y:Y(3+Math.sqrt(3)*r*Math.sin(-.8))+ (i?14:14),fill:css("blue"),"font-size":15,"font-style":"italic"});
- tx.textContent=i<2?`f = ${lv}`:"f = d*";
+ tx.textContent=i<2?`f = ${lv}`:"f = c*";
  const n=[8,7,6][i];
  for(let k=0;k<n;k++){const th=2*Math.PI*k/n+.35,px=3+Math.sqrt(6)*r*Math.cos(th),py=3+Math.sqrt(3)*r*Math.sin(th);
   if(i==2&&Math.abs(px-xs)<.5&&Math.abs(py-yc(xs))<.5)continue;
   const[a,b]=grad(px,py),L=Math.hypot(a,b);
   el("line",{x1:X(px),y1:Y(py),x2:X(px)+a/L*34,y2:Y(py)-b/L*34,stroke:css("blue"),"stroke-width":1.4,"marker-end":"url(#mblue)"},normals)}
 });
-// 束縛曲線
+// 制約曲線
 let d="";for(let x=0;x<=6;x+=.05){if(yc(x)<=6)d+=(d?"L":"M")+X(x)+" "+Y(yc(x))}
 el("path",{d,stroke:css("red"),"stroke-width":3,fill:"none"});
 el("text",{x:470,y:Y(yc(5))-22,fill:css("red"),"font-size":18,"font-style":"italic"}).textContent="g(x,y) = c";
